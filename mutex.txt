@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+
+void *odd(void *n)
+{
+        //pthread_mutex_lock(&m);
+
+        if (*(int*)n%2 ==1)
+                printf("%d este impar\n", *(int*)n);
+        else
+                printf("%d este par\n", *(int*)n);
+
+        //pthread_mutex_unlock(&m);
+
+        return NULL;
+}
+
+int main(int argc, char **argv)
+{
+        int n = argc;
+        int aux;
+        pthread_t threads[n];
+
+        pthread_mutex_init(&m, NULL);
+
+        for (int i = 2; i < n; i++)
+        {
+                aux = atoi(argv[i]);
+                int *k;
+                k = (int*)malloc(sizeof(int));
+                *k = aux;
+
+                int ok = pthread_create(&threads[i], NULL, odd, (void*)k);
+                if (ok != 0)
+                        printf("The thread was not created!\n");
+        }
+
+
+        printf("Mark\n");
+
+        for (int i = 2; i < n; i++)
+                pthread_join(threads[i], NULL);
+
+        printf("All threads have been joined!\n");
+
+        pthread_mutex_destroy(&m);
+        return 0;
+}
